@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ape-authentication-deployment
+  labels:
+    app: ape-authentication-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ape-authentication
+  template:
+    metadata:
+      labels:
+        app: ape-authentication
+    spec:
+      containers:
+        - image: jansuklje/ape-authentication-service:latest
+          name: ape-authentication
+          env:
+            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret-url
+                  key: url
+            - name: KUMULUZEE_DATASOURCES0_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret-username
+                  key: username
+            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret-password
+                  key: password
+          ports:
+            - containerPort: 8080
