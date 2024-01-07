@@ -3,24 +3,12 @@
     <persistence-unit name="ape-authentication-jpa" transaction-type="RESOURCE_LOCAL">
         <non-jta-data-source>jdbc/APEParcelDS</non-jta-data-source>
 
-        <class>si.ape.authentication.models.entities.ParcelEntity</class>
-        <class>si.ape.authentication.models.entities.ParcelStatusEntity</class>
-        <class>si.ape.authentication.models.entities.StreetEntity</class>
-        <class>si.ape.authentication.models.entities.CityEntity</class>
-        <class>si.ape.authentication.models.entities.CountryEntity</class>
         <class>si.ape.authentication.models.entities.UserEntity</class>
         <class>si.ape.authentication.models.entities.RoleEntity</class>
-        <class>si.ape.authentication.models.entities.CustomerEntity</class>
 
         <class>si.ape.authentication.models.converters.InstantAtributeConverter</class>
-        <class>si.ape.authentication.models.converters.ParcelConverter</class>
-        <class>si.ape.authentication.models.converters.ParcelStatusConverter</class>
-        <class>si.ape.authentication.models.converters.StreetConverter</class>
-        <class>si.ape.authentication.models.converters.CityConverter</class>
-        <class>si.ape.authentication.models.converters.CountryConverter</class>
         <class>si.ape.authentication.models.converters.UserConverter</class>
         <class>si.ape.authentication.models.converters.RoleConverter</class>
-        <class>si.ape.authentication.models.converters.CustomerConverter</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>

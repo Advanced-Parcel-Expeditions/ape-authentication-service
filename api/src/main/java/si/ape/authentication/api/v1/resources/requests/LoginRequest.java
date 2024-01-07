@@ -1,22 +1,16 @@
-package si.ape.authentication.lib;
+package si.ape.authentication.api.v1.resources.requests;
 
-public class User {
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-    private Integer id;
+import javax.json.bind.annotation.JsonbProperty;
 
+public class LoginRequest {
+    @Schema(required = true)
+    @JsonbProperty("username")
     private String username;
-
+    @Schema(required = true)
+    @JsonbProperty("password")
     private String password;
-
-    private Role role;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;
@@ -32,14 +26,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
 }

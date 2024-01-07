@@ -1,6 +1,6 @@
 package si.ape.authentication.lib;
 
-public class Customer {
+public class Employee {
 
     private Integer id;
 
@@ -8,11 +8,7 @@ public class Customer {
 
     private String surname;
 
-    private String companyName;
-
-    private String telephoneNumber;
-
-    private Street street;
+    private Branch branch;
 
     private User user;
 
@@ -40,28 +36,12 @@ public class Customer {
         this.surname = surname;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public Branch getBranch() {
+        return branch;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getTelephoneNumber() {
-        return telephoneNumber;
-    }
-
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
-    }
-
-    public Street getStreet() {
-        return street;
-    }
-
-    public void setStreet(Street street) {
-        this.street = street;
+    public void setBranch(Branch branch) {
+        this.branch = branch;
     }
 
     public User getUser() {

@@ -1,7 +1,8 @@
 package si.ape.authentication.models.converters;
 
-import si.ape.authentication.lib.Customer;
+import si.ape.authentication.lib.User;
 import si.ape.authentication.models.entities.CustomerEntity;
+import si.ape.authentication.lib.Customer;
 
 public class CustomerConverter {
 
@@ -12,10 +13,9 @@ public class CustomerConverter {
         dto.setName(entity.getName());
         dto.setSurname(entity.getSurname());
         dto.setCompanyName(entity.getCompanyName());
-        dto.setTelNum(entity.getTelNum());
-        dto.setStreet(StreetConverter.toDto(entity.getStreet()));
-        dto.setUser(UserConverter.toDto(entity.getUser()));
-
+        dto.setTelephoneNumber(entity.getTelephoneNumber());
+        dto.setStreet(entity.getStreet() == null ? null : StreetConverter.toDto(entity.getStreet()));
+        dto.setUser(entity.getUser() == null ? null : UserConverter.toDto(entity.getUser()));
         return dto;
 
     }
@@ -27,10 +27,9 @@ public class CustomerConverter {
         entity.setName(dto.getName());
         entity.setSurname(dto.getSurname());
         entity.setCompanyName(dto.getCompanyName());
-        entity.setTelNum(dto.getTelNum());
+        entity.setTelephoneNumber(dto.getTelephoneNumber());
         entity.setStreet(StreetConverter.toEntity(dto.getStreet()));
         entity.setUser(UserConverter.toEntity(dto.getUser()));
-
         return entity;
 
     }

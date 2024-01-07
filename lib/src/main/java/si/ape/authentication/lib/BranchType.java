@@ -1,17 +1,17 @@
 package si.ape.authentication.lib;
 
-public class Country {
+public class BranchType {
 
-    private String code;
+    private Integer id;
 
     private String name;
 
-    public String getCode() {
-        return code;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
