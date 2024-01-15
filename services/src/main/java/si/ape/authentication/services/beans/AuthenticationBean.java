@@ -40,7 +40,7 @@ public class AuthenticationBean {
             KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
 
             String role = userEntity.getRole().getRoleName();
-            Integer userId = 0;
+            Integer userId = userEntity.getId();
 
             String name = "";
             String surname = "";
