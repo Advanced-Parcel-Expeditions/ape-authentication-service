@@ -40,7 +40,7 @@ public class AuthenticationBean {
             KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
 
             String role = userEntity.getRole().getRoleName();
-            Integer userId = userEntity.getId();
+            Integer userId = 0;
 
             String name = "";
             String surname = "";
@@ -54,6 +54,7 @@ public class AuthenticationBean {
                         .orElse(null);
 
                 if (customerEntity != null) {
+                    userId = customerEntity.getId();
                     name = customerEntity.getName();
                     surname = customerEntity.getSurname();
                 }
@@ -65,6 +66,7 @@ public class AuthenticationBean {
                         .orElse(null);
 
                 if (employeeEntity != null) {
+                    userId = employeeEntity.getId();
                     name = employeeEntity.getName();
                     surname = employeeEntity.getSurname();
                     branchId = employeeEntity.getBranch().getId();
@@ -121,6 +123,7 @@ public class AuthenticationBean {
                     .claim("groups", Arrays.asList(role))
                     .claim("roles", Arrays.asList(role))
                     .claim("typ", "https://example.com/register")
+                    .claim("userId", userId)
                     .claim("name", name)
                     .claim("surname", surname)
                     .claim("branchId", branchId)
