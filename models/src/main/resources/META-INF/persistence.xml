@@ -5,10 +5,26 @@
 
         <class>si.ape.authentication.models.entities.UserEntity</class>
         <class>si.ape.authentication.models.entities.RoleEntity</class>
+        <class>si.ape.authentication.models.entities.UserRoleEntity</class>
+        <class>si.ape.authentication.models.entities.EmployeeEntity</class>
+        <class>si.ape.authentication.models.entities.CustomerEntity</class>
+        <class>si.ape.authentication.models.entities.StreetEntity</class>
+        <class>si.ape.authentication.models.entities.CityEntity</class>
+        <class>si.ape.authentication.models.entities.CountryEntity</class>
+        <class>si.ape.authentication.models.entities.BranchEntity</class>
+        <class>si.ape.authentication.models.entities.BranchTypeEntity</class>
 
         <class>si.ape.authentication.models.converters.InstantAtributeConverter</class>
         <class>si.ape.authentication.models.converters.UserConverter</class>
         <class>si.ape.authentication.models.converters.RoleConverter</class>
+        <class>si.ape.authentication.models.converters.UserRoleConverter</class>
+        <class>si.ape.authentication.models.converters.EmployeeConverter</class>
+        <class>si.ape.authentication.models.converters.CustomerConverter</class>
+        <class>si.ape.authentication.models.converters.StreetConverter</class>
+        <class>si.ape.authentication.models.converters.CityConverter</class>
+        <class>si.ape.authentication.models.converters.CountryConverter</class>
+        <class>si.ape.authentication.models.converters.BranchConverter</class>
+        <class>si.ape.authentication.models.converters.BranchTypeConverter</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
