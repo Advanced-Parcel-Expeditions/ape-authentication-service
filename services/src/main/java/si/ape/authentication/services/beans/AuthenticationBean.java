@@ -40,6 +40,36 @@ public class AuthenticationBean {
             KeyPair keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
 
             String role = userEntity.getRole().getRoleName();
+            Integer userId = userEntity.getId();
+
+            String name = "";
+            String surname = "";
+            Integer branchId = null;
+
+            if (userEntity.getRole().getId() == 8) {
+                CustomerEntity customerEntity = em.createNamedQuery("CustomerEntity.getByUserId", CustomerEntity.class)
+                        .setParameter("userId", userId)
+                        .getResultStream()
+                        .findFirst()
+                        .orElse(null);
+
+                if (customerEntity != null) {
+                    name = customerEntity.getName();
+                    surname = customerEntity.getSurname();
+                }
+            } else {
+                EmployeeEntity employeeEntity = em.createNamedQuery("EmployeeEntity.getByUserId", EmployeeEntity.class)
+                        .setParameter("userId", userId)
+                        .getResultStream()
+                        .findFirst()
+                        .orElse(null);
+
+                if (employeeEntity != null) {
+                    name = employeeEntity.getName();
+                    surname = employeeEntity.getSurname();
+                    branchId = employeeEntity.getBranch().getId();
+                }
+            }
 
             String privateKeyString = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpJVCU/SKhL5Is\n" +
                     "Pz5zcUad3gFmo+ZBFOCtc40IPc5+tBEtpvgt5H3u5jtgjz7yPsuySUX8xEqUB4h8\n" +
@@ -91,6 +121,9 @@ public class AuthenticationBean {
                     .claim("groups", Arrays.asList(role))
                     .claim("roles", Arrays.asList(role))
                     .claim("typ", "https://example.com/register")
+                    .claim("name", name)
+                    .claim("surname", surname)
+                    .claim("branchId", branchId)
                     .setId("1234567890")
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
