@@ -127,6 +127,7 @@ public class AuthenticationBean {
                     .claim("groups", Arrays.asList(role))
                     .claim("roles", Arrays.asList(role))
                     .claim("typ", "https://example.com/register")
+                    .setAudience("ape-frontend-service")
                     .claim("userId", userId)
                     .claim("name", name)
                     .claim("surname", surname)
