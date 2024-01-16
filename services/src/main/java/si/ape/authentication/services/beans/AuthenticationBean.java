@@ -134,8 +134,8 @@ public class AuthenticationBean {
                     .claim("branchName", branchName)
                     .setId("1234567890")
                     .setIssuedAt(new Date())
-                    //.setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-                    .setExpiration(new Date(System.currentTimeMillis() + 3600000 * 24)) // 24 hours
+                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+                    //.setExpiration(new Date(System.currentTimeMillis() + 3600000 * 24)) // 24 hours
                     .signWith(key)
                     .compact();
 
