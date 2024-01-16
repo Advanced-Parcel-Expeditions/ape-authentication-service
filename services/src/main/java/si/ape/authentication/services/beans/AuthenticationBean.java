@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -169,17 +170,29 @@ public class AuthenticationBean {
 
     public CustomerEntity registerCustomer(Customer customerDto) {
         try {
-            RoleEntity roleEntity = em.createNamedQuery("RoleEntity.getById", RoleEntity.class)
-                    .setParameter("roleId", 8)
-                    .getResultStream()
-                    .findFirst()
-                    .orElse(null);
+            RoleEntity roleEntity = em.find(RoleEntity.class, 8);
 
-            UserEntity userEntity = new UserEntity();
+            beginTx();
+
+            TypedQuery<UserEntity> query = em.createNamedQuery("UserEntity.getByUsername", UserEntity.class)
+                    .setParameter("username", customerDto.getUser().getUsername());
+            UserEntity userEntity = query.getResultStream().findFirst().orElse(null);
+
+            if (userEntity != null) {
+                log.severe("User with username " + customerDto.getUser().getUsername() + " already exists.");
+                rollbackTx();
+                return null;
+            }
+
+            userEntity = new UserEntity();
             userEntity.setUsername(customerDto.getUser().getUsername());
             userEntity.setPassword(getPasswordHash(customerDto.getUser().getPassword()));
             userEntity.setRole(roleEntity);
             em.persist(userEntity);
+
+            commitTx();
+
+            beginTx();
 
             StreetEntity streetEntity = em.createNamedQuery("StreetEntity.getById", StreetEntity.class)
                     .setParameter("streetNumber", customerDto.getStreet().getStreetNumber())
@@ -191,6 +204,8 @@ public class AuthenticationBean {
                     .findFirst()
                     .orElse(null);
 
+            System.out.println("Street entity: " + streetEntity);
+
             CustomerEntity customerEntity = new CustomerEntity();
             customerEntity.setName(customerDto.getName());
             customerEntity.setSurname(customerDto.getSurname());
@@ -200,9 +215,15 @@ public class AuthenticationBean {
             customerEntity.setStreet(streetEntity);
             em.persist(customerEntity);
 
+            System.out.println("Transaction persisted: ");
+
             commitTx();
+
+            System.out.println("Transaction commited");
+
             return customerEntity;
         } catch (Exception e) {
+            e.printStackTrace();
             log.severe("Error while registering customer: " + e.getMessage());
             rollbackTx();
             return null;
@@ -213,11 +234,12 @@ public class AuthenticationBean {
         try {
             beginTx();
 
-            RoleEntity roleEntity = em.createNamedQuery("RoleEntity.getById", RoleEntity.class)
+            /*RoleEntity roleEntity = em.createNamedQuery("RoleEntity.getById", RoleEntity.class)
                     .setParameter("roleId", employeeDto.getUser().getRole().getId())
                     .getResultStream()
                     .findFirst()
-                    .orElse(null);
+                    .orElse(null);*/
+            RoleEntity roleEntity = em.find(RoleEntity.class, employeeDto.getUser().getRole().getId());
 
             if (roleEntity == null) {
                 log.severe("Role with ID " + employeeDto.getUser().getRole().getId() + " does not exist.");
@@ -225,17 +247,28 @@ public class AuthenticationBean {
                 return null;
             }
 
-            UserEntity userEntity = new UserEntity();
+            TypedQuery<UserEntity> query = em.createNamedQuery("UserEntity.getByUsername", UserEntity.class)
+                    .setParameter("username", employeeDto.getUser().getUsername());
+            UserEntity userEntity = query.getResultStream().findFirst().orElse(null);
+
+            if (userEntity != null) {
+                log.severe("User with username " + employeeDto.getUser().getUsername() + " already exists.");
+                rollbackTx();
+                return null;
+            }
+
+            userEntity = new UserEntity();
             userEntity.setUsername(employeeDto.getUser().getUsername());
             userEntity.setPassword(getPasswordHash(employeeDto.getUser().getPassword()));
             userEntity.setRole(roleEntity);
             em.persist(userEntity);
 
-            BranchEntity branchEntity = em.createNamedQuery("BranchEntity.getById", BranchEntity.class)
+            /*BranchEntity branchEntity = em.createNamedQuery("BranchEntity.getById", BranchEntity.class)
                     .setParameter("branchId", employeeDto.getBranch().getId())
                     .getResultStream()
                     .findFirst()
-                    .orElse(null);
+                    .orElse(null);*/
+            BranchEntity branchEntity = em.find(BranchEntity.class, employeeDto.getBranch().getId());
 
             if (branchEntity == null) {
                 log.severe("Branch with ID " + employeeDto.getBranch().getId() + " does not exist.");

@@ -30,9 +30,9 @@ public class CustomerEntity {
     @JoinColumns({
             @JoinColumn(name = "street_name", referencedColumnName = "street_name"),
             @JoinColumn(name = "street_number", referencedColumnName = "street_number"),
-            @JoinColumn(name = "city_code", referencedColumnName = "code"),
-            @JoinColumn(name = "city_name", referencedColumnName = "name"),
-            @JoinColumn(name = "city_country", referencedColumnName = "country_code")
+            @JoinColumn(name = "city_code", referencedColumnName = "city_code"),
+            @JoinColumn(name = "city_name", referencedColumnName = "city_name"),
+            @JoinColumn(name = "country_code", referencedColumnName = "country_code")
     })
     private StreetEntity street;
 

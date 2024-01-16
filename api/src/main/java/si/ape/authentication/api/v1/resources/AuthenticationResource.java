@@ -71,6 +71,11 @@ public class AuthenticationResource {
             // Convert the request to a partial Customer DTO.
             Customer customer = getCustomer(registerCustomerRequest);
 
+            System.out.println(customer);
+            System.out.println(customer.getName());
+            System.out.println(customer.getSurname());
+            System.out.println(customer.getUser());
+
             if (authenticationBean.registerCustomer(customer) == null) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
