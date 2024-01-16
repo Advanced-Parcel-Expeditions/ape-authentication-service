@@ -9,6 +9,7 @@ import si.ape.authentication.lib.Employee;
 import si.ape.authentication.models.entities.*;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.security.KeyFactory;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 
-@ApplicationScoped
+@RequestScoped
 public class AuthenticationBean {
 
     private final Logger log = Logger.getLogger(AuthenticationBean.class.getName());
@@ -45,6 +46,7 @@ public class AuthenticationBean {
             String name = "";
             String surname = "";
             Integer branchId = null;
+            String branchName = "";
 
             if (userEntity.getRole().getId() == 8) {
                 CustomerEntity customerEntity = em.createNamedQuery("CustomerEntity.getByUserId", CustomerEntity.class)
@@ -70,6 +72,7 @@ public class AuthenticationBean {
                     name = employeeEntity.getName();
                     surname = employeeEntity.getSurname();
                     branchId = employeeEntity.getBranch().getId();
+                    branchName = employeeEntity.getBranch().getName();
                 }
             }
 
@@ -127,6 +130,7 @@ public class AuthenticationBean {
                     .claim("name", name)
                     .claim("surname", surname)
                     .claim("branchId", branchId)
+                    .claim("branchName", branchName)
                     .setId("1234567890")
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
