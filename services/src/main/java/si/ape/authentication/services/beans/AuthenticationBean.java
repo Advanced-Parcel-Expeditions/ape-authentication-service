@@ -4,10 +4,21 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import io.jsonwebtoken.security.Keys;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 import si.ape.authentication.lib.Customer;
 import si.ape.authentication.lib.Employee;
 import si.ape.authentication.models.entities.*;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -19,16 +30,57 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 
 @RequestScoped
 public class AuthenticationBean {
 
+    private static final String ZOOKEEPER_ADDRESS = "zookeeper:2181";
+    private static final String CONFIG_ZNODE = "/config";
+
     private final Logger log = Logger.getLogger(AuthenticationBean.class.getName());
 
     @Inject
     private EntityManager em;
+
+    private static ZooKeeper zk;
+
+    @PostConstruct
+    public void init() {
+        try {
+            CountDownLatch connectedSignal = new CountDownLatch(1);
+            zk = new ZooKeeper(ZOOKEEPER_ADDRESS, 3000, event -> {
+                if (event.getState() == Watcher.Event.KeeperState.SyncConnected) {
+                    connectedSignal.countDown();
+                }
+            });
+
+            connectedSignal.await(); // Wait until connected
+            log.info("Connected to ZooKeeper");
+            /*byte[] data = zk.getData("/" + "jwt-private-key", false, new Stat());
+
+            if (data != null) {
+                String keyValue = new String(data);
+                log.info("Value for key " + "jwt-private-key" + ": " + keyValue);
+            } else {
+                log.info("Key " + "jwt-private-key" + " not found");
+            }*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //connectAndWatchZooKeeper();
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        try {
+            zk.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public String validate(String username, String password) {
         UserEntity userEntity = em.createNamedQuery("UserEntity.getByUsername", UserEntity.class)
@@ -77,7 +129,7 @@ public class AuthenticationBean {
                 }
             }
 
-            String privateKeyString = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpJVCU/SKhL5Is\n" +
+            /*String privateKeyString = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpJVCU/SKhL5Is\n" +
                     "Pz5zcUad3gFmo+ZBFOCtc40IPc5+tBEtpvgt5H3u5jtgjz7yPsuySUX8xEqUB4h8\n" +
                     "8QnNmDLpZ8UUCIpvXEz6nbfBfBrljRdZWTweRsfbCR3s/ZQAFXS5yPP++SxUpXwa\n" +
                     "MkiPMRzF4j8au5Waqc31ocq5CtAGSyUIzRtOt+YDANwRiN9HNwOBugE0Qllhy7hT\n" +
@@ -102,47 +154,62 @@ public class AuthenticationBean {
                     "2hSEX5wKlzYnpKco8AC4NsqHSL/Ep952o2fGp4XfAoGBALoXhnf4aGJ4jZpzRMMT\n" +
                     "VXj4nQ5KnIYekbj+IdDElU62CCr/FrQW92usEFWiV11U08bcndybvaj0Mg/KdhOX\n" +
                     "fHQBzJb++RloHQaLgRo7HAz/wwZ/IZO598opPH7CIOCA7JNqjLOGOj+IeNEIlI4W\n" +
-                    "q3gqL5zP4xfE0SgRNEue42wH";
-            privateKeyString = privateKeyString.replace("\n", "").replace("\r", "");
-
-            // Generate private key from string
-            byte[] privateKeyBytes = java.util.Base64.getDecoder().decode(privateKeyString);
-            // Convert the bytes into a Key instance
-            PrivateKey key = null;
+                    "q3gqL5zP4xfE0SgRNEue42wH";*/
             try {
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-                key = keyFactory.generatePrivate(keySpec);
+                String privateKeyString = new String(zk.getData("/jwt-private-key", false, new Stat()));
+                privateKeyString = privateKeyString.replace("\n", "").replace("\r", "");
+
+                // Generate private key from string
+                byte[] privateKeyBytes = java.util.Base64.getDecoder().decode(privateKeyString);
+                // Convert the bytes into a Key instance
+                PrivateKey key = null;
+                try {
+                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+                    key = keyFactory.generatePrivate(keySpec);
+                } catch (Exception e) {
+                    log.severe("Error while generating private key: " + e.getMessage());
+                    return null;
+                }
+
+                String iss = new String(zk.getData("/jwt-iss", false, new Stat()));
+                String aud = new String(zk.getData("/jwt-aud", false, new Stat()));
+                String typ = new String(zk.getData("/jwt-typ", false, new Stat()));
+                String id = new String(zk.getData("/jwt-id", false, new Stat()));
+
+                String jwtToken = Jwts.builder()
+                        .setHeaderParam("typ", "JWT")
+                        .setSubject(username)
+                        //.setIssuer("ape-authentication-service")
+                        .setIssuer(iss)
+                        //.setAudience("ape-frontend-service")
+                        .setAudience(aud)
+                        .claim("upn", username)
+                        .claim("nbf", new Date())
+                        .claim("groups", Arrays.asList(role))
+                        .claim("roles", Arrays.asList(role))
+                        //.claim("typ", "https://example.com/register")
+                        .claim("typ", typ)
+                        .claim("userId", userId)
+                        .claim("name", name)
+                        .claim("surname", surname)
+                        .claim("branchId", branchId)
+                        .claim("branchName", branchName)
+                        //.setId("1234567890")
+                        .setId(id)
+                        .setIssuedAt(new Date())
+                        .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+                        //.setExpiration(new Date(System.currentTimeMillis() + 3600000 * 24)) // 24 hours
+                        .signWith(key)
+                        .compact();
+
+                System.out.println("JWT token: " + jwtToken);
+
+                return jwtToken;
             } catch (Exception e) {
-                log.severe("Error while generating private key: " + e.getMessage());
+                e.printStackTrace();
                 return null;
             }
-
-            String jwtToken = Jwts.builder()
-                    .setHeaderParam("typ", "JWT")
-                    .setSubject(username)
-                    .setIssuer("ape-authentication-service")
-                    .claim("upn", username)
-                    .claim("nbf", new Date())
-                    .claim("groups", Arrays.asList(role))
-                    .claim("roles", Arrays.asList(role))
-                    .claim("typ", "https://example.com/register")
-                    .setAudience("ape-frontend-service")
-                    .claim("userId", userId)
-                    .claim("name", name)
-                    .claim("surname", surname)
-                    .claim("branchId", branchId)
-                    .claim("branchName", branchName)
-                    .setId("1234567890")
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-                    //.setExpiration(new Date(System.currentTimeMillis() + 3600000 * 24)) // 24 hours
-                    .signWith(key)
-                    .compact();
-
-            System.out.println("JWT token: " + jwtToken);
-
-            return jwtToken;
         } else {
             return null;
         }
