@@ -22,12 +22,12 @@ public class RegisterEmployeeRequest {
     // Metadata in the `staff` table:
 
     @Schema(required = true)
-    @JsonbProperty("name")
-    private String name;
+    @JsonbProperty("firstName")
+    private String firstName;
 
     @Schema(required = true)
-    @JsonbProperty("surname")
-    private String surname;
+    @JsonbProperty("lastName")
+    private String lastName;
 
     @Schema(required = true)
     @JsonbProperty("branchId")
@@ -57,20 +57,20 @@ public class RegisterEmployeeRequest {
         this.roleId = roleId;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Integer getBranchId() {

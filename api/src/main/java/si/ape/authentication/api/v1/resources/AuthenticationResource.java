@@ -130,10 +130,10 @@ public class AuthenticationResource {
 
     private static Employee getEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
         System.out.println("Get employee");
-        System.out.println(registerEmployeeRequest.getName());
+        System.out.println(registerEmployeeRequest.getFirstName());
         Employee employee = new Employee();
-        employee.setName(registerEmployeeRequest.getName());
-        employee.setSurname(registerEmployeeRequest.getSurname());
+        employee.setName(registerEmployeeRequest.getFirstName());
+        employee.setSurname(registerEmployeeRequest.getLastName());
         Branch branch = new Branch();
         branch.setId(registerEmployeeRequest.getBranchId());
         User user = new User();
