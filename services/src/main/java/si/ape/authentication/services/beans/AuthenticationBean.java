@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @RequestScoped
 public class AuthenticationBean {
 
-    private static final String ZOOKEEPER_ADDRESS = "zookeeper:2181";
+    private static final String ZOOKEEPER_ADDRESS = "localhost:2181";
     private static final String CONFIG_ZNODE = "/config";
 
     private final Logger log = Logger.getLogger(AuthenticationBean.class.getName());
@@ -59,18 +59,9 @@ public class AuthenticationBean {
 
             connectedSignal.await(); // Wait until connected
             log.info("Connected to ZooKeeper");
-            /*byte[] data = zk.getData("/" + "jwt-private-key", false, new Stat());
-
-            if (data != null) {
-                String keyValue = new String(data);
-                log.info("Value for key " + "jwt-private-key" + ": " + keyValue);
-            } else {
-                log.info("Key " + "jwt-private-key" + " not found");
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //connectAndWatchZooKeeper();
     }
 
     @PreDestroy
@@ -355,6 +346,7 @@ public class AuthenticationBean {
             commitTx();
             return employeeEntity;
         } catch (Exception e) {
+            e.printStackTrace();
             log.severe("Error while registering employee: " + e.getMessage());
             rollbackTx();
             return null;
