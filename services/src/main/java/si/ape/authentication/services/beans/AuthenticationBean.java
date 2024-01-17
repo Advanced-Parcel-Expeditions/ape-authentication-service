@@ -342,6 +342,9 @@ public class AuthenticationBean {
                 return null;
             }
 
+            System.out.println("Employee name: " + employeeDto.getName());
+            System.out.println("Employee surname: " + employeeDto.getSurname());
+
             EmployeeEntity employeeEntity = new EmployeeEntity();
             employeeEntity.setName(employeeDto.getName());
             employeeEntity.setSurname(employeeDto.getSurname());

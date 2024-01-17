@@ -129,6 +129,8 @@ public class AuthenticationResource {
     }
 
     private static Employee getEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
+        System.out.println("Get employee");
+        System.out.println(registerEmployeeRequest.getName());
         Employee employee = new Employee();
         employee.setName(registerEmployeeRequest.getName());
         employee.setSurname(registerEmployeeRequest.getSurname());
