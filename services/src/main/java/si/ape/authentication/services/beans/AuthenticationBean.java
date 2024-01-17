@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @RequestScoped
 public class AuthenticationBean {
 
-    private static final String ZOOKEEPER_ADDRESS = "localhost:2181";
+    private static final String ZOOKEEPER_ADDRESS = "zookeeper:2181";
     private static final String CONFIG_ZNODE = "/config";
 
     private final Logger log = Logger.getLogger(AuthenticationBean.class.getName());
