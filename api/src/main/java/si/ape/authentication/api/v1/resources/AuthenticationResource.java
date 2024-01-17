@@ -95,15 +95,19 @@ public class AuthenticationResource {
 
         authenticationBean = CDI.current().select(AuthenticationBean.class).get();
 
+        System.out.println("Register employee");
+
         try {
             // Convert the request to a partial Employee DTO.
             Employee employee = getEmployee(registerEmployeeRequest);
 
             if (authenticationBean.registerEmployee(employee) == null) {
+                System.out.println("Failed to register employee");
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             return Response.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
             log.severe(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }

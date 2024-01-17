@@ -294,6 +294,7 @@ public class AuthenticationBean {
         try {
             beginTx();
 
+            System.out.println("Registering employee: " + employeeDto);
             /*RoleEntity roleEntity = em.createNamedQuery("RoleEntity.getById", RoleEntity.class)
                     .setParameter("roleId", employeeDto.getUser().getRole().getId())
                     .getResultStream()
@@ -306,6 +307,8 @@ public class AuthenticationBean {
                 rollbackTx();
                 return null;
             }
+
+            System.out.println("role found successfully");
 
             TypedQuery<UserEntity> query = em.createNamedQuery("UserEntity.getByUsername", UserEntity.class)
                     .setParameter("username", employeeDto.getUser().getUsername());
@@ -323,11 +326,14 @@ public class AuthenticationBean {
             userEntity.setRole(roleEntity);
             em.persist(userEntity);
 
+            commitTx();
+
             /*BranchEntity branchEntity = em.createNamedQuery("BranchEntity.getById", BranchEntity.class)
                     .setParameter("branchId", employeeDto.getBranch().getId())
                     .getResultStream()
                     .findFirst()
                     .orElse(null);*/
+            beginTx();
             BranchEntity branchEntity = em.find(BranchEntity.class, employeeDto.getBranch().getId());
 
             if (branchEntity == null) {
